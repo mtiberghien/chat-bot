@@ -2,22 +2,25 @@ from flask import render_template, current_app as app, request, redirect, url_fo
 import datetime
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.languages import FRE
 
-bot = ChatBot('Calculator',
+bot = ChatBot('Chat-bot',
               storage_adapter='chatterbot.storage.SQLStorageAdapter',
               logic_adapters=[
                   {
                       'import_path': 'chatterbot.logic.BestMatch',
                       'default_response': 'Désolé, je n\'ai pas compris',
                       'maximum_similarity_threshold': 0.99
+                  },
+                  {
+                      'import_path': 'chatterbot.logic.MathematicalEvaluation',
+                      'language': FRE
                   }
               ],
               database_uri='sqlite:///database.sqlite3')
 
 trainer = ChatterBotCorpusTrainer(bot)
 trainer.train('chatterbot.corpus.french')
-
-
 @app.route('/')
 def index():
     now = datetime.datetime.now()
